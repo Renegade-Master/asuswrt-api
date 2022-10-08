@@ -1,9 +1,12 @@
 package main
 
 import (
+	"crypto/tls"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 	"os"
+	"time"
 )
 
 type Options struct {
@@ -12,6 +15,21 @@ type Options struct {
 	Port     uint   `required:"true" long:"port" description:"Port of the Asus WRT Router"`
 	Username string `required:"true" short:"u" long:"username" description:"Username of the account on the Asus WRT Router"`
 	Password string `required:"true" short:"p" long:"password" description:"Password of the account on the Asus WRT Router"`
+}
+
+func NewHttpClient() *http.Client {
+	log.Infof("Running AsusWrt Client init\n")
+
+	// Disable Certificate Checking
+	tlsConfig := tls.Config{InsecureSkipVerify: true}
+
+	client := http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tlsConfig},
+	}
+
+	return &client
 }
 
 func main() {
@@ -45,9 +63,10 @@ func main() {
 		port:     opts.Port,
 		username: opts.Username,
 		password: opts.Password,
+		Client:   NewHttpClient(),
 	}
 
 	log.Debug("AsusWRT Client: %+v\n", asusWrt)
 
-	asusWrt.login()
+	asusWrt.Login()
 }

@@ -5,6 +5,15 @@ import (
 	"testing"
 )
 
+type MockAsusWrtClient struct {
+	DoLogin func() error
+}
+
+func (m *MockAsusWrtClient) Login() error {
+	fmt.Println("Hello, World!")
+	return nil
+}
+
 func Test(t *testing.T) {
 	fmt.Println("Hello, World!")
 }
@@ -19,7 +28,7 @@ func TestCreateAsusWrtClient(t *testing.T) {
 
 	fmt.Printf("%+v\n", asusWrt)
 
-	if err := asusWrt.login(); err != nil {
+	if err := asusWrt.Login(); err != nil {
 		t.Errorf("Error connecting to the AsusWRT Device: %s\n", err)
 	}
 }

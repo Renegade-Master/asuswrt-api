@@ -1,41 +1,53 @@
 package main
 
 import (
-	"crypto/tls"
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
-	"net/url"
 )
 
+// AsusWrtClient Interface for defining methods that should exist in an AsusWrt
+type AsusWrtClient interface {
+	// Login Connects to the Asus WRT Router and assigns a Token to the internal Client
+	Login() error
+	Logout() error
+}
+
 type AsusWrt struct {
+	Client   *http.Client
 	ipAddr   string
 	port     uint
 	username string
 	password string
 }
 
-func (awrt AsusWrt) login() error {
+func (awrt *AsusWrt) Login() error {
 	baseAddr := fmt.Sprintf("%s:%d", awrt.ipAddr, awrt.port)
 	auth := fmt.Sprintf("%s:%s", awrt.username, awrt.password)
 	loginToken := base64.StdEncoding.EncodeToString([]byte(auth))
-	//headers := map[string]string{
-	//	"user-agent": "asusrouter-Android-DUTUtil-1.0.0.245",
-	//}
+	reqUrl := fmt.Sprintf("https://%s/login.cgi", baseAddr)
 
-	// Disable Certificate Checking
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	jsonBody := []byte(`{"login_authorization": ` + loginToken + `}`)
+	bodyReader := bytes.NewReader(jsonBody)
 
-	payload := url.Values{}
-	payload.Add("login_authorization", loginToken)
+	req, err := http.NewRequest(http.MethodPost, reqUrl, bodyReader)
 
-	r, err := http.PostForm(fmt.Sprintf("https://%s/login.cgi", baseAddr), payload)
+	r, err := awrt.Client.Do(req)
 
 	if err != nil {
 		log.Errorf("Request Failed: %s", err)
 		return err
 	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Errorf("Error closing the HTTP Request")
+		}
+	}(r.Body)
 
 	log.Infof("Request Success!\n")
 
@@ -52,18 +64,4 @@ func (awrt AsusWrt) login() error {
 	}
 
 	return nil
-
-	//try:
-	//	r, err := requests.post(url='http://%s/login.cgi'), data=payload, headers=headers).json()
-	//except:
-	//	return False
-	//	if "asus_token" in r:
-	//	token = r['asus_token']
-	//	self.headers = {
-	//		'user-agent': "asusrouter-Android-DUTUtil-1.0.0.245",
-	//			'cookie': 'asus_token={}'.format(token)
-	//	}
-	//	return True
-	//	else:
-	//	return False
 }
