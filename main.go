@@ -66,7 +66,7 @@ func main() {
 		Client:   NewHttpClient(),
 	}
 
-	log.Debug("AsusWRT Client: %+v\n", asusWrt)
+	log.Debugf("AsusWRT Client: %+v\n", asusWrt)
 
 	asusWrt.Login()
 }
