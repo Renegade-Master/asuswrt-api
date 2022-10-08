@@ -1,4 +1,4 @@
-name: Go
+name: Go Build
 
 on:
   push:
@@ -7,10 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-    name:
-    runs-on: ubuntu-latest
+    name: "Build and Test"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
 
