@@ -18,6 +18,8 @@ func TestCreateAsusWrtClient(t *testing.T) {
 	}
 
 	fmt.Printf("%+v\n", asusWrt)
-	asusWrt.login()
 
+	if err := asusWrt.login(); err != nil {
+		t.Errorf("Error connecting to the AsusWRT Device: %s\n", err)
+	}
 }

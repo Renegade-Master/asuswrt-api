@@ -16,7 +16,7 @@ type AsusWrt struct {
 	password string
 }
 
-func (awrt AsusWrt) login() {
+func (awrt AsusWrt) login() error {
 	baseAddr := fmt.Sprintf("%s:%d", awrt.ipAddr, awrt.port)
 	auth := fmt.Sprintf("%s:%s", awrt.username, awrt.password)
 	loginToken := base64.StdEncoding.EncodeToString([]byte(auth))
@@ -34,10 +34,24 @@ func (awrt AsusWrt) login() {
 
 	if err != nil {
 		log.Errorf("Request Failed: %s", err)
-		return
+		return err
 	}
 
-	log.Infof("Request Success!\n%+v", r)
+	log.Infof("Request Success!\n")
+
+	if r != nil {
+		log.Infof("Response: %+v\n", *r)
+	}
+
+	if r.Header != nil {
+		log.Infof("Header: %+v\n", r.Header)
+	}
+
+	if r.Body != nil {
+		log.Infof("Body: %+v\n", r.Body)
+	}
+
+	return nil
 
 	//try:
 	//	r, err := requests.post(url='http://%s/login.cgi'), data=payload, headers=headers).json()

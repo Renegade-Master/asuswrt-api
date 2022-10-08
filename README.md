@@ -55,3 +55,9 @@ Execute the following commands:
    ```shell
    go test -v ./...
    ```
+
+## References
+
+* [vrachieru/asuswrt-api](https://github.com/vrachieru/asuswrt-api)
+* [Vaskivskyi/asusrouter](https://github.com/Vaskivskyi/asusrouter)
+* [kennedyshead/aioasuswrt](https://github.com/kennedyshead/aioasuswrt)

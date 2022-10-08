@@ -35,10 +35,10 @@ func main() {
 	}
 	log.Infof("Flags accepted!\n")
 
-	log.Infof("IP Address:\t%s\n", opts.IpAddr)
-	log.Infof("Port:\t%d\n", opts.Port)
-	log.Infof("Username:\t%s\n", opts.Username)
-	log.Infof("Password:\t%s\n", opts.Password)
+	log.Debugf("IP Address:\t%s\n", opts.IpAddr)
+	log.Debugf("Port:\t%d\n", opts.Port)
+	log.Debugf("Username:\t%s\n", opts.Username)
+	log.Debugf("Password:\t%s\n", opts.Password)
 
 	var asusWrt = AsusWrt{
 		ipAddr:   opts.IpAddr,
@@ -47,7 +47,7 @@ func main() {
 		password: opts.Password,
 	}
 
-	log.Infof("AsusWRT Client: %+v\n", asusWrt)
+	log.Debug("AsusWRT Client: %+v\n", asusWrt)
 
 	asusWrt.login()
 }
