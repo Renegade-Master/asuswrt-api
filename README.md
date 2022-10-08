@@ -1,4 +1,5 @@
 # asuswrt-api
+
 A Client API for the Asus WRT Router.
 
 ## Description
@@ -32,7 +33,7 @@ Or simply use Go Run:
 
    ```shell
    go build -o build/asuswrt-api
-   go run ./ [flags]
+   go run ./... [flags]
    ```
 
 ## Updating Dependencies
@@ -43,4 +44,14 @@ Execute the following commands:
 
    ```shell
    go mod tidy -compat=1.19
+   ```
+
+## Testing
+
+Execute the following commands:
+
+1. Run all tests:
+
+   ```shell
+   go test -v ./...
    ```

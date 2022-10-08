@@ -11,6 +11,7 @@
 *.dll
 *.so
 *.dylib
+build/
 
 # Test binary, built with `go test -c`
 *.test
@@ -116,4 +117,3 @@ modules.xml
 *.ipr
 
 # End of https://www.toptal.com/developers/gitignore/api/go,goland+iml
-
