@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 )
 
@@ -14,54 +13,78 @@ type AsusWrtClient interface {
 	// Login Connects to the Asus WRT Router and assigns a Token to the internal Client
 	Login() error
 	Logout() error
+	GetWanTraffic() error
 }
 
 type AsusWrt struct {
-	Client   *http.Client
-	ipAddr   string
-	port     uint
-	username string
-	password string
+	Client    *http.Client
+	url       string
+	username  string
+	password  string
+	useragent string
 }
 
 func (awrt *AsusWrt) Login() error {
-	baseAddr := fmt.Sprintf("%s:%d", awrt.ipAddr, awrt.port)
 	auth := fmt.Sprintf("%s:%s", awrt.username, awrt.password)
 	loginToken := base64.StdEncoding.EncodeToString([]byte(auth))
-	reqUrl := fmt.Sprintf("https://%s/login.cgi", baseAddr)
 
-	jsonBody := []byte(`{"login_authorization": ` + loginToken + `}`)
+	jsonBody := []byte(`{"login_authorization": "` + loginToken + `"}`)
 	bodyReader := bytes.NewReader(jsonBody)
 
-	req, err := http.NewRequest(http.MethodPost, reqUrl, bodyReader)
-
-	r, err := awrt.Client.Do(req)
+	r, err := awrt.sendRequest(http.MethodPost, "login.cgi", bodyReader)
 
 	if err != nil {
 		log.Errorf("Request Failed: %s", err)
 		return err
 	}
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Errorf("Error closing the HTTP Request")
-		}
-	}(r.Body)
-
 	log.Infof("Request Success!\n")
 
 	if r != nil {
-		log.Infof("Response: %+v\n", *r)
+		log.Debugf("Response: %+v\n", *r)
 	}
 
 	if r.Header != nil {
-		log.Infof("Header: %+v\n", r.Header)
+		log.Debugf("Header: %+v\n", r.Header)
 	}
 
 	if r.Body != nil {
-		log.Infof("Body: %+v\n", r.Body)
+		log.Debugf("Body: %+v\n", r.Body)
+	}
+
+	if r.Cookies() != nil {
+		log.Debugf("Cookies:\n")
+		for _, cookie := range r.Cookies() {
+			log.Debugf("Cookie: [%s]\nValue: [%s]\n", cookie, cookie.Value)
+		}
 	}
 
 	return nil
 }
+
+func (awrt *AsusWrt) sendRequest(method string, path string, payload *bytes.Reader) (*http.Response, error) {
+	var req *http.Request
+	reqPath := fmt.Sprintf("%s/%s", awrt.url, path)
+
+	if r, err := http.NewRequest(method, reqPath, payload); err != nil {
+		log.Errorf("Failed to create Request: %s", err)
+	} else {
+		req = r
+	}
+
+	req.Header.Set("User-Agent", awrt.useragent)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	log.Debugf("Request: [%+v]", req)
+
+	if resp, err := awrt.Client.Do(req); err != nil {
+		log.Errorf("Request Failed: %s", err)
+		return nil, err
+	} else {
+		return resp, nil
+	}
+}
+
+//func (awrt *AsusWrt) GetWanTraffic() error {
+//
+//}

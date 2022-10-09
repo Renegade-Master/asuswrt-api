@@ -1,27 +1,28 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 )
-
-type MockAsusWrtClient struct {
-	DoLogin func() error
-}
-
-func (m *MockAsusWrtClient) Login() error {
-	fmt.Println("Hello, World!")
-	return nil
-}
 
 func Test(t *testing.T) {
 	fmt.Println("Hello, World!")
 }
 
 func TestCreateAsusWrtClient(t *testing.T) {
+	expected := "Test"
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, expected)
+	}))
+
 	var asusWrt = AsusWrt{
-		ipAddr:   "127.0.0.1",
-		port:     9999,
+		Client:   MockHttpClient(),
+		url:      svr.URL,
 		username: "test_user",
 		password: "test_pass",
 	}
@@ -31,4 +32,19 @@ func TestCreateAsusWrtClient(t *testing.T) {
 	if err := asusWrt.Login(); err != nil {
 		t.Errorf("Error connecting to the AsusWRT Device: %s\n", err)
 	}
+}
+
+func MockHttpClient() *http.Client {
+	log.Infof("Running AsusWrt Client init\n")
+
+	// Disable Certificate Checking
+	tlsConfig := tls.Config{InsecureSkipVerify: true}
+
+	client := http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tlsConfig},
+	}
+
+	return &client
 }

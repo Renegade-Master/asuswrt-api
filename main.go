@@ -10,11 +10,22 @@ import (
 )
 
 type Options struct {
-	Verbose  []bool `required:"false" short:"v" long:"verbose" description:"Show verbose debug information"`
-	IpAddr   string `required:"true" short:"a" long:"address" description:"IP Address of the Asus WRT Router"`
-	Port     uint   `required:"true" long:"port" description:"Port of the Asus WRT Router"`
-	Username string `required:"true" short:"u" long:"username" description:"Username of the account on the Asus WRT Router"`
-	Password string `required:"true" short:"p" long:"password" description:"Password of the account on the Asus WRT Router"`
+	Verbose   []bool `required:"false" short:"v" long:"verbose" description:"Show verbose debug information"`
+	Url       string `required:"true" short:"a" long:"address" description:"URL of the Asus WRT Router"`
+	Username  string `required:"true" short:"u" long:"username" description:"Username of the account on the Asus WRT Router"`
+	Password  string `required:"true" short:"p" long:"password" description:"Password of the account on the Asus WRT Router"`
+	UserAgent string `required:"false" long:"useragent" description:"UserAgent to display to the Asus WRT Router" choice:"desktop" choice:"android"`
+}
+
+func getUserAgent(v *Options) string {
+	switch v.UserAgent {
+	case "desktop":
+		return "Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101 Firefox/101.0"
+	case "android":
+		return "asusrouter-Android-DUTUtil-1.0.0.3.58-163"
+	default:
+		return "curl/7.81.0"
+	}
 }
 
 func NewHttpClient() *http.Client {
@@ -33,6 +44,7 @@ func NewHttpClient() *http.Client {
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	var opts Options
 	parser := flags.NewParser(&opts, flags.Default)
 
@@ -53,20 +65,16 @@ func main() {
 	}
 	log.Infof("Flags accepted!\n")
 
-	log.Debugf("IP Address:\t%s\n", opts.IpAddr)
-	log.Debugf("Port:\t%d\n", opts.Port)
-	log.Debugf("Username:\t%s\n", opts.Username)
-	log.Debugf("Password:\t%s\n", opts.Password)
-
 	var asusWrt = AsusWrt{
-		ipAddr:   opts.IpAddr,
-		port:     opts.Port,
-		username: opts.Username,
-		password: opts.Password,
-		Client:   NewHttpClient(),
+		url:       opts.Url,
+		username:  opts.Username,
+		password:  opts.Password,
+		Client:    NewHttpClient(),
+		useragent: getUserAgent(&opts),
 	}
 
 	log.Debugf("AsusWRT Client: %+v\n", asusWrt)
 
 	asusWrt.Login()
+	//asusWrt.GetWanTraffic()
 }
