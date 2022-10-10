@@ -1,11 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"encoding/base64"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"net/url"
+	"strings"
+)
+
+const (
+	Desktop string = "Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101 Firefox/101.0"
+	Android        = "asusrouter-Android-DUTUtil-1.0.0.3.58-163"
 )
 
 // AsusWrtClient Interface for defining methods that should exist in an AsusWrt
@@ -17,21 +23,20 @@ type AsusWrtClient interface {
 }
 
 type AsusWrt struct {
-	Client    *http.Client
-	url       string
-	username  string
-	password  string
-	useragent string
+	Client   *http.Client
+	url      string
+	username string
+	password string
 }
 
 func (awrt *AsusWrt) Login() error {
 	auth := fmt.Sprintf("%s:%s", awrt.username, awrt.password)
 	loginToken := base64.StdEncoding.EncodeToString([]byte(auth))
 
-	jsonBody := []byte(`{"login_authorization": "` + loginToken + `"}`)
-	bodyReader := bytes.NewReader(jsonBody)
+	form := url.Values{}
+	form.Add("login_authorization", loginToken)
 
-	r, err := awrt.sendRequest(http.MethodPost, "login.cgi", bodyReader)
+	response, err := awrt.sendRequest(http.MethodPost, "login.cgi", strings.NewReader(form.Encode()), Android)
 
 	if err != nil {
 		log.Errorf("Request Failed: %s", err)
@@ -40,21 +45,21 @@ func (awrt *AsusWrt) Login() error {
 
 	log.Infof("Request Success!\n")
 
-	if r != nil {
-		log.Debugf("Response: %+v\n", *r)
+	if response != nil {
+		log.Debugf("Response: %+v\n", *response)
 	}
 
-	if r.Header != nil {
-		log.Debugf("Header: %+v\n", r.Header)
+	if response.Header != nil {
+		log.Debugf("Header: %+v\n", response.Header)
 	}
 
-	if r.Body != nil {
-		log.Debugf("Body: %+v\n", r.Body)
+	if response.Body != nil {
+		log.Debugf("Body: %+v\n", response.Body)
 	}
 
-	if r.Cookies() != nil {
+	if response.Cookies() != nil {
 		log.Debugf("Cookies:\n")
-		for _, cookie := range r.Cookies() {
+		for _, cookie := range response.Cookies() {
 			log.Debugf("Cookie: [%s]\nValue: [%s]\n", cookie, cookie.Value)
 		}
 	}
@@ -62,7 +67,17 @@ func (awrt *AsusWrt) Login() error {
 	return nil
 }
 
-func (awrt *AsusWrt) sendRequest(method string, path string, payload *bytes.Reader) (*http.Response, error) {
+func (awrt *AsusWrt) Logout() error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (awrt *AsusWrt) GetWanTraffic() error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (awrt *AsusWrt) sendRequest(method string, path string, payload *strings.Reader, useragent string) (*http.Response, error) {
 	var req *http.Request
 	reqPath := fmt.Sprintf("%s/%s", awrt.url, path)
 
@@ -72,7 +87,9 @@ func (awrt *AsusWrt) sendRequest(method string, path string, payload *bytes.Read
 		req = r
 	}
 
-	req.Header.Set("User-Agent", awrt.useragent)
+	req.Header.Set("User-Agent", useragent)
+	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	log.Debugf("Request: [%+v]", req)
@@ -84,7 +101,3 @@ func (awrt *AsusWrt) sendRequest(method string, path string, payload *bytes.Read
 		return resp, nil
 	}
 }
-
-//func (awrt *AsusWrt) GetWanTraffic() error {
-//
-//}
