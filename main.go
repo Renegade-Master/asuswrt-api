@@ -17,8 +17,6 @@ type Options struct {
 }
 
 func NewHttpClient() *http.Client {
-	log.Infof("Running AsusWrt Client init\n")
-
 	// Disable Certificate Checking
 	tlsConfig := tls.Config{InsecureSkipVerify: true}
 
