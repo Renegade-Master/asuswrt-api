@@ -19,7 +19,6 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -77,8 +76,6 @@ func TestLoout(t *testing.T) {
 }
 
 func MockHttpClient() *http.Client {
-	log.Infof("Running AsusWrt Client init\n")
-
 	// Disable Certificate Checking
 	tlsConfig := tls.Config{InsecureSkipVerify: true}
 
