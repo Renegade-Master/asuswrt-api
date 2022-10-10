@@ -54,14 +54,18 @@ func main() {
 	log.Infof("Flags accepted!\n")
 
 	var asusWrt AsusWrtClient = &AsusWrt{
-		url:      opts.Url,
-		username: opts.Username,
-		password: opts.Password,
-		Client:   NewHttpClient(),
+		Client: NewHttpClient(),
+		url:    opts.Url,
 	}
 
 	log.Debugf("AsusWRT Client: %+v\n", asusWrt)
 
-	asusWrt.Login()
-	//asusWrt.GetWanTraffic()
+	log.Infof("Logging in...\n\n")
+	asusWrt.Login(opts.Username, opts.Password)
+
+	log.Infof("Get Connected Clients...\n\n")
+	asusWrt.GetConnectedClients()
+
+	log.Infof("Logging out...\n\n")
+	asusWrt.Logout()
 }
