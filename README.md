@@ -32,7 +32,6 @@ Or simply use Go Run:
 1. Run the project:
 
    ```shell
-   go build -o build/asuswrt-api
    go run ./... [flags]
    ```
 

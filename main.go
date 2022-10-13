@@ -2,11 +2,13 @@ package main
 
 import (
 	"crypto/tls"
-	"github.com/jessevdk/go-flags"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/jessevdk/go-flags"
+	awrt "github.com/renegade-master/asuswrt-api/asuswrt"
+	log "github.com/sirupsen/logrus"
 )
 
 type Options struct {
@@ -51,9 +53,9 @@ func main() {
 	}
 	log.Infof("Flags accepted!\n")
 
-	var asusWrt AsusWrtClient = &AsusWrt{
+	var asusWrt awrt.AsusWrtClient = &awrt.AsusWrt{
 		Client: NewHttpClient(),
-		url:    opts.Url,
+		Url:    opts.Url,
 	}
 
 	log.Debugf("AsusWRT Client: %+v\n", asusWrt)

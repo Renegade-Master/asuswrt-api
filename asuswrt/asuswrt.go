@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-package main
+package asuswrt
 
 import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -43,7 +44,7 @@ type AsusWrtClient interface {
 
 type AsusWrt struct {
 	Client *http.Client
-	url    string
+	Url    string
 }
 
 func (awrt *AsusWrt) Login(username string, password string) error {
@@ -120,7 +121,7 @@ func (awrt *AsusWrt) GetWanTraffic() error {
 }
 
 func sendRequest[T *bytes.Reader | *strings.Reader](client *AsusWrt, method string, path string, payload T, useragent string) (*http.Response, error) {
-	reqPath := fmt.Sprintf("%s/%s", client.url, path)
+	reqPath := fmt.Sprintf("%s/%s", client.Url, path)
 
 	if request, err := http.NewRequest(method, reqPath, io.Reader(payload)); err != nil {
 		log.Errorf("Failed to create Request: %s", err)

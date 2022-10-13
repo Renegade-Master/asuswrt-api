@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package main
+package asuswrt
 
 import (
 	"crypto/tls"
@@ -32,7 +32,7 @@ func Test(t *testing.T) {
 func TestCreateClient(t *testing.T) {
 	var asusWrt = AsusWrt{
 		Client: MockHttpClient(),
-		url:    "https://127.0.0.1:8443",
+		Url:    "https://127.0.0.1:8443",
 	}
 
 	fmt.Printf("%+v\n", asusWrt)
@@ -43,12 +43,15 @@ func TestLogin(t *testing.T) {
 		"Connection: close"
 
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, expected)
+		_, err := fmt.Fprintf(w, expected)
+		if err != nil {
+			t.Fail()
+		}
 	}))
 
 	var asusWrt = AsusWrt{
 		Client: MockHttpClient(),
-		url:    svr.URL,
+		Url:    svr.URL,
 	}
 
 	if err := asusWrt.Login("test_user", "test_pass"); err != nil {
@@ -67,7 +70,7 @@ func TestLoout(t *testing.T) {
 
 	var asusWrt = AsusWrt{
 		Client: MockHttpClient(),
-		url:    svr.URL,
+		Url:    svr.URL,
 	}
 
 	if err := asusWrt.Logout(); err != nil {
