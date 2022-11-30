@@ -12,10 +12,10 @@ import (
 )
 
 type Options struct {
-	Verbose  []bool `required:"false" short:"v" long:"verbose" description:"Show verbose debug information"`
-	Url      string `required:"true" short:"a" long:"address" description:"URL of the Asus WRT Router"`
-	Username string `required:"true" short:"u" long:"username" description:"Username of the account on the Asus WRT Router"`
-	Password string `required:"true" short:"p" long:"password" description:"Password of the account on the Asus WRT Router"`
+	Verbose  []bool `required:"false" short:"v" long:"verbose"  description:"Show verbose debug information"`
+	Url      string `required:"true"  short:"a" long:"address"  description:"URL of the Asus WRT Router"`
+	Username string `required:"true"  short:"u" long:"username" description:"Username of the account on the Asus WRT Router"`
+	Password string `required:"true"  short:"p" long:"password" description:"Password of the account on the Asus WRT Router"`
 }
 
 func NewHttpClient() *http.Client {
@@ -53,7 +53,7 @@ func main() {
 	}
 	log.Infof("Flags accepted!\n")
 
-	var asusWrt awrt.AsusWrtClient = &awrt.AsusWrt{
+	var asusWrt awrt.WrtClient = &awrt.AsusWrt{
 		Client: NewHttpClient(),
 		Url:    opts.Url,
 	}
