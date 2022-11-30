@@ -59,7 +59,7 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func TestLoout(t *testing.T) {
+func TestLogout(t *testing.T) {
 	expected := "{" +
 		"\"error_status\":\"1\"" +
 		"}"

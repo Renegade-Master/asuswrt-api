@@ -42,7 +42,11 @@ func sendRequest[
 		request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-		session := getSession(client, request, SessionName)
+		var session *sessions.Session
+		if session, err = getSession(client, request, SessionName); err != nil {
+			log.Errorf("Request Failed: %s", err)
+			return nil, err
+		}
 
 		log.Debugf("Request: [%+v]", request)
 		log.Debugf("Request Session: [%+v]", session)
@@ -62,11 +66,11 @@ func sendRequest[
 	}
 }
 
-func getSession(client *AsusWrt, request *http.Request, sessionName string) *sessions.Session {
+func getSession(client *AsusWrt, request *http.Request, sessionName string) (*sessions.Session, error) {
 	if session, err := client.store.Get(request, sessionName); err != nil {
-		return session
-	} else {
 		log.Errorf("Failed to retrieve Session information: %s", err)
-		return nil
+		return nil, err
+	} else {
+		return session, nil
 	}
 }
