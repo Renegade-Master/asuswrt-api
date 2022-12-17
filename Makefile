@@ -7,6 +7,9 @@ clean:
 	go clean
 	rm -rf ${BUILD_FOLDER}/*
 
+tidy:
+	go mod tidy -compat=1.19
+
 build:
 	go build -v -o ${BUILD_FOLDER}/ ./...
 

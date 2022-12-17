@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,14 +41,7 @@ func sendRequest[
 		request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-		var session *sessions.Session
-		if session, err = getSession(client, request, sessionName); err != nil {
-			log.Errorf("Request Failed: %s", err)
-			return nil, err
-		}
-
 		log.Debugf("Request: [%+v]", request)
-		log.Debugf("Request Session: [%+v]", session)
 
 		if response, err := client.Client.Do(request); err != nil {
 			log.Errorf("Request Failed: %s", err)
@@ -65,14 +57,5 @@ func sendRequest[
 				return response, nil
 			}
 		}
-	}
-}
-
-func getSession(client *AsusWrt, request *http.Request, sessionName string) (*sessions.Session, error) {
-	if session, err := client.store.Get(request, sessionName); err != nil {
-		log.Errorf("Failed to retrieve Session information: %s", err)
-		return nil, err
-	} else {
-		return session, nil
 	}
 }

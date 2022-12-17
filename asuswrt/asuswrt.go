@@ -24,7 +24,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -53,12 +52,10 @@ type WrtClient interface {
 // AsusWrt is an implementation of the WrtClient interface
 type AsusWrt struct {
 	Client *http.Client
-	store  *sessions.CookieStore
 	Url    string
 }
 
 func (awrt *AsusWrt) Login(username string, password string) error {
-	awrt.store = sessions.NewCookieStore()
 	auth := fmt.Sprintf("%s:%s", username, password)
 	loginToken := base64.StdEncoding.EncodeToString([]byte(auth))
 
