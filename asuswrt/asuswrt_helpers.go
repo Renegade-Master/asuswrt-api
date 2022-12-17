@@ -43,7 +43,7 @@ func sendRequest[
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 		var session *sessions.Session
-		if session, err = getSession(client, request, SessionName); err != nil {
+		if session, err = getSession(client, request, sessionName); err != nil {
 			log.Errorf("Request Failed: %s", err)
 			return nil, err
 		}
@@ -55,6 +55,8 @@ func sendRequest[
 			log.Errorf("Request Failed: %s", err)
 			return nil, err
 		} else {
+			defer response.Body.Close()
+
 			switch response.StatusCode {
 			case 400:
 				log.Infof("Invalid request. Rejected by Server")

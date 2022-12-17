@@ -29,10 +29,10 @@ import (
 )
 
 const (
-	Android string = "asusrouter-Android-DUTUtil-1.0.0.3.58-163"
-	Desktop        = "Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101 Firefox/101.0"
+	android string = "asusrouter-Android-DUTUtil-1.0.0.3.58-163"
+	desktop        = "Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101 Firefox/101.0"
 
-	SessionName = "main"
+	sessionName = "main"
 )
 
 // WrtClient is an interface for defining methods that should exist in a WrtClient
@@ -66,7 +66,7 @@ func (awrt *AsusWrt) Login(username string, password string) error {
 	form.Add("login_authorization", loginToken)
 	encForm := strings.NewReader(form.Encode())
 
-	if response, err := sendRequest(awrt, http.MethodPost, "login.cgi", encForm, Android); err != nil {
+	if response, err := sendRequest(awrt, http.MethodPost, "login.cgi", encForm, android); err != nil {
 		log.Errorf("Request Failed: %s", err)
 		return err
 	} else {
@@ -98,7 +98,7 @@ func (awrt *AsusWrt) Logout() error {
 	form := url.Values{}
 	encForm := strings.NewReader(form.Encode())
 
-	if response, err := sendRequest(awrt, http.MethodPost, "Logout.asp", encForm, Android); err != nil {
+	if response, err := sendRequest(awrt, http.MethodPost, "Logout.asp", encForm, android); err != nil {
 		log.Errorf("Request Failed: %s", err)
 		return err
 	} else {
@@ -115,7 +115,7 @@ func (awrt *AsusWrt) GetConnectedClients() error {
 	jsonBody := []byte(`{"hook": ` + payload + `}`)
 	encForm := bytes.NewReader(jsonBody)
 
-	if response, err := sendRequest(awrt, http.MethodPost, "appGet.cgi", encForm, Android); err != nil {
+	if response, err := sendRequest(awrt, http.MethodPost, "appGet.cgi", encForm, android); err != nil {
 		log.Errorf("Request Failed: %s", err)
 		return err
 	} else {
